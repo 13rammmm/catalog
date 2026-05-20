@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Strain Catalog 2026</title>
+<style>
+  @font-face {
+    font-family: 'Coolvetica';
+    src: url('COOLVETICA_RG.OTF') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --cream: #f0ebe0;
+    --card-bg: #f0ebe0;
+    --dark-green: #2d4a2a;
+    --black: #0e0e0e;
+    --text-dark: #111111;
+    --gold: #c9a84c;
+
+    /* Fluid spacing */
+    --gap: 18px;
+    --pad-h: 40px;
+    --pad-v: 48px;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: #111;
+    background-image: url('images/fondo.png');
+    background-size: cover;
+    background-attachment: scroll; /* fixed causes jank on iOS */
+    background-position: center top;
+    min-height: 100vh;
+    font-family: 'Coolvetica', sans-serif;
+    color: var(--cream);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--pad-v) var(--pad-h) 20px;
+    position: relative;
+  }
+
+  .logo-img {
+    width: 380px;
+    max-width: 80vw;
+    display: block;
+    background: transparent;
+    filter: drop-shadow(0 4px 24px rgba(0,0,0,0.5));
+    mix-blend-mode: screen;
+  }
+
+  .header-sub {
+    margin-top: 10px;
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(240,235,224,0.4);
+  }
+
+  .header-divider {
+    width: 100%;
+    max-width: 900px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240,235,224,0.2), transparent);
+    margin: 24px auto 0;
+  }
+
+  .year-tag {
+    position: absolute;
+    right: var(--pad-h);
+    bottom: 28px;
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: rgba(240,235,224,0.22);
+    text-transform: uppercase;
+  }
+
+  /* ─── GRID ─── */
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gap);
+    padding: clamp(16px, 3vw, 32px) var(--pad-h) clamp(40px, 6vw, 60px);
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ════════════════════════════════
+     TABLET  (≤ 1080px)
+  ════════════════════════════════ */
+  @media (max-width: 1080px) {
+    .catalog-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ════════════════════════════════
+     MOBILE  (≤ 768px)
+     Reescrito desde cero
+  ════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* ── BODY ── */
+    body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    /* ── HEADER ──
+       Usamos un wrapper div como contexto limpio.
+       El problema del logo descentrado viene de que mix-blend-mode
+       crea un stacking context que interfiere con flexbox en Safari/iOS.
+       Solución: centramos con text-align en el padre y display:inline-block en el img. */
+    .header {
+      width: 100%;
+      padding: 36px 0 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .logo-img {
+      /* inline-block + text-align:center en el padre = centrado perfecto
+         incluso con mix-blend-mode activo */
+      display: inline-block;
+      width: 78vw;
+      max-width: 320px;
+      height: auto;
+      margin: 0;
+      position: static;
+      left: auto;
+      right: auto;
+      transform: none;
+      mix-blend-mode: screen;
+    }
+
+    .header-sub {
+      display: block;
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 5px;
+      margin-top: 12px;
+      padding: 0;
+      position: static;
+      transform: none;
+    }
+
+    .header-divider {
+      width: 60%;
+      margin: 16px auto 0;
+      display: block;
+    }
+
+    .year-tag { display: none; }
+
+    /* ── GRID ── */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 16px 10px 40px;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    /* ── CARDS ──
+       Altura calculada para que quepan en pantalla sin scroll:
+       2 columnas con gap 10px y padding 10px cada lado
+       → cada tarjeta mide (100vw - 30px) / 2 de ancho
+       Usamos aspect-ratio 3/4 para proporciones naturales */
+    .card-wrap {
+      aspect-ratio: 3/4;
+      height: auto;
+      min-height: unset;
+      width: 100%;
+    }
+
+    /* ── FRONT ── */
+    .front-header {
+      padding: 10px 10px 6px;
+      gap: 6px;
+    }
+    .front-num  { font-size: 12px; }
+    .front-name { font-size: 15px; letter-spacing: 0; }
+
+    .front-img-area {
+      padding: 2px 4px;
+    }
+
+    .front-footer {
+      padding: 6px 10px 8px;
+    }
+    .front-thc  { font-size: 11px; }
+    .front-tap  { font-size: 7px; letter-spacing: 1px; }
+
+    /* ── BACK ── */
+    .back-top {
+      padding: 10px 10px 7px;
+      gap: 6px;
+    }
+    .back-num  { font-size: 12px; }
+    .back-name { font-size: 15px; letter-spacing: 0; }
+
+    .back-body {
+      padding: 6px 10px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .info-block { padding: 5px 0; }
+    .info-label { font-size: 7px; letter-spacing: 2px; }
+    .info-value { font-size: 12px; }
+    .thc-big    { font-size: 26px; }
+    .thc-sub    { font-size: 8px; }
+    .back-foot {
+      padding: 6px 10px 8px;
+    }
+    .back-close { font-size: 7px; }
+    .back-brand { font-size: 8px; letter-spacing: 1px; }
+
+    /* ── PAGE FOOTER ── */
+    .page-footer { padding: 10px 16px 28px; }
+    .footer-txt  { font-size: 7px; letter-spacing: 3px; }
+  }
+
+  /* ════════════════════════════════
+     PHONES MUY PEQUEÑOS (≤ 390px)
+  ════════════════════════════════ */
+  @media (max-width: 390px) {
+    .catalog-grid { gap: 8px; padding: 12px 8px 32px; }
+    .logo-img     { width: 82vw; }
+  }
+
+  /* ─── REDUCE MOTION ─── */
+  @media (prefers-reduced-motion: reduce) {
+    .card-wrap { animation: none; opacity: 1; }
+    .card-inner { transition: transform 0.4s ease; }
+    .front-img-area img { transition: none; }
+  }
+
+  /* ─── CARD ─── */
+  .card-wrap {
+    perspective: 900px;
+    cursor: pointer;
+    aspect-ratio: 3/4;
+    opacity: 0;
+    animation: fadeUp 0.4s ease forwards;
+    will-change: transform;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Reduce animation stagger on mobile to feel snappier */
+  .card-wrap:nth-child(1){animation-delay:.04s}
+  .card-wrap:nth-child(2){animation-delay:.08s}
+  .card-wrap:nth-child(3){animation-delay:.12s}
+  .card-wrap:nth-child(4){animation-delay:.16s}
+  .card-wrap:nth-child(5){animation-delay:.20s}
+  .card-wrap:nth-child(6){animation-delay:.24s}
+  .card-wrap:nth-child(7){animation-delay:.28s}
+  .card-wrap:nth-child(8){animation-delay:.32s}
+
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.35, 0.1, 0.15, 1);
+    border-radius: 14px;
+    position: relative;
+    will-change: transform;
+  }
+
+  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-front,
+  .card-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+  }
+
+  /* ── FRONT ── */
+  .card-front {
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Only apply hover on non-touch devices */
+  @media (hover: hover) {
+    .card-wrap:hover .card-front {
+      box-shadow: 0 14px 50px rgba(0,0,0,0.75), 0 4px 12px rgba(0,0,0,0.4);
+    }
+  }
+
+  .front-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 14px 16px 8px;
+  }
+
+  .front-num {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 17px;
+    color: #555;
+    letter-spacing: 1px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .front-name {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 22px;
+    color: var(--text-dark);
+    line-height: 1;
+    letter-spacing: 0.3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* IMAGE CONTAINER — fully transparent */
+  .front-img-area {
+    flex: 1;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .front-img-area img {
+    width: 90%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+    display: block;
+    /* Only animate on hover-capable devices */
+    transition: transform 0.5s ease;
+  }
+
+  @media (hover: hover) {
+    .card-wrap:hover .front-img-area img { transform: scale(1.04); }
+  }
+
+  .front-footer {
+    padding: 8px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(0,0,0,0.07);
+    flex-shrink: 0;
+  }
+
+  .front-thc {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 13px;
+    color: #555;
+    letter-spacing: 0.5px;
+  }
+
+  .front-tap {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(0,0,0,0.25);
+    text-transform: uppercase;
+  }
+
+  /* ── BACK ── mismo estilo limpio que el frente */
+  .card-back {
+    transform: rotateY(180deg);
+    background: var(--card-bg);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .back-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+
+  .back-num {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 17px;
+    color: #555;
+    letter-spacing: 1px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .back-name {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 22px;
+    color: var(--text-dark);
+    line-height: 1;
+    letter-spacing: 0.3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .back-body {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+    scrollbar-width: none;
+  }
+  .back-body::-webkit-scrollbar { display: none; }
+
+  .info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 0;
+    flex-shrink: 0;
+  }
+
+  .info-label {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  .info-value {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 15px;
+    color: var(--text-dark);
+    letter-spacing: 0.3px;
+    line-height: 1.25;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .sep {
+    height: 1px;
+    background: rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+
+  .thc-big {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 40px;
+    color: var(--text-dark);
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
+  .thc-sub {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #888;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .back-foot {
+    padding: 8px 16px 12px;
+    border-top: 1px solid rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .back-close {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(0,0,0,0.25);
+    text-transform: uppercase;
+  }
+
+  .back-brand {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(0,0,0,0.2);
+    text-transform: uppercase;
+  }
+
+  /* ─── FOOTER ─── */
+  .page-footer {
+    text-align: center;
+    padding: 16px var(--pad-h) 44px;
+  }
+
+  .footer-txt {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(240,235,224,0.15);
+  }
+
+  /* ─── LANGUAGE TOGGLE ─── */
+  #lang-toggle {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: rgba(14,14,14,0.72);
+    border: 1px solid rgba(240,235,224,0.14);
+    border-radius: 20px;
+    padding: 5px 4px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #lang-toggle .lang-opt {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 14px;
+    transition: background 0.22s ease, color 0.22s ease;
+    color: rgba(240,235,224,0.35);
+    line-height: 1;
+  }
+
+  #lang-toggle .lang-opt.active {
+    background: rgba(240,235,224,0.13);
+    color: rgba(240,235,224,0.9);
+  }
+
+  #lang-toggle .lang-sep {
+    font-family: 'Coolvetica', sans-serif;
+    font-size: 10px;
+    color: rgba(240,235,224,0.18);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    #lang-toggle {
+      top: 12px;
+      left: 12px;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Language Toggle -->
+<div id="lang-toggle" role="button" aria-label="Change language" tabindex="0">
+  <span class="lang-opt" data-lang="es">ES</span>
+  <span class="lang-sep">/</span>
+  <span class="lang-opt" data-lang="en">EN</span>
+</div>
+
+<div class="header">
+  <img class="logo-img" src="images/strain_logo.png" alt="Strain Catalog">
+  <div class="header-sub" data-i18n="header_sub">Premium Genetics</div>
+  <div class="header-divider"></div>
+  <div class="year-tag">2026</div>
+</div>
+
+<div class="catalog-grid" id="grid"></div>
+
+<div class="page-footer">
+  <div class="footer-txt" data-i18n="footer_txt">Strain Catalog · 2026 · Premium Selection</div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────
+   TRANSLATION SYSTEM
+───────────────────────────────────────── */
+const translations = {
+  es: {
+    /* Header / Footer */
+    header_sub:      'Genéticas Premium',
+    footer_txt:      'Catálogo de genéticas · 2026 · Selección premium',
+
+    /* Card back — info labels */
+    label_genetica:  'Genética',
+    label_tipo:      'Tipo',
+    label_thc:       'THC',
+    label_perfil:    'Perfil de terpenos',
+    thc_sub:         'Contenido de THC',
+
+    /* Card front/back — tap hints */
+    tap_open:        'toca para abrir',
+    tap_close:       'toca para cerrar',
+
+    /* Strain types */
+    tipo_indica:     'Híbrida Indica Dominante',
+    tipo_sativa:     'Híbrida Sativa Dominante',
+    tipo_balanced:   'Híbrida Balanceada',
+  },
+  en: {
+    /* Header / Footer */
+    header_sub:      'Premium Strains',
+    footer_txt:      'Strain Catalog · 2026 · Premium Selection',
+
+    /* Card back — info labels */
+    label_genetica:  'Genetics',
+    label_tipo:      'Type',
+    label_thc:       'THC',
+    label_perfil:    'Terpene Profile',
+    thc_sub:         'THC Content',
+
+    /* Card front/back — tap hints */
+    tap_open:        'tap to open',
+    tap_close:       'tap to close',
+
+    /* Strain types */
+    tipo_indica:     'Indica-dominant hybrid',
+    tipo_sativa:     'Sativa-dominant hybrid',
+    tipo_balanced:   'Balanced hybrid',
+  }
+};
+
+/* Map raw Spanish tipo strings → translation keys */
+const tipoKeyMap = {
+  'Híbrida Indica Dominante':  'tipo_indica',
+  'Híbrida Sativa Dominante':  'tipo_sativa',
+  'Híbrida Balanceada':        'tipo_balanced',
+};
+
+/* Terpene term translations (EN canonical → localized) */
+const terpeneMap = {
+  es: {
+    'Diesel':    'Diesel',
+    'Citrus':    'Cítrico',
+    'Earthy':    'Terroso',
+    'Creamy':    'Cremoso',
+    'Pepper':    'Pimienta',
+    'Floral':    'Floral',
+    'Berry':     'Frutos rojos',
+    'Pine':      'Pino',
+    'Tropical':  'Tropical',
+    'Sweet':     'Dulce',
+  },
+  en: {
+    'Diesel':    'Diesel',
+    'Citrus':    'Citrus',
+    'Earthy':    'Earthy',
+    'Creamy':    'Creamy',
+    'Pepper':    'Pepper',
+    'Floral':    'Floral',
+    'Berry':     'Berry',
+    'Pine':      'Pine',
+    'Tropical':  'Tropical',
+    'Sweet':     'Sweet',
+  }
+};
+
+function translateProfile(profile) {
+  const map = terpeneMap[currentLang] || terpeneMap['en'];
+  return profile.map(p => map[p] || p).join(' · ');
+}
+
+let currentLang = localStorage.getItem('lang') || 'es';
+
+function t(key) {
+  return (translations[currentLang] || translations['es'])[key] || key;
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  document.documentElement.lang = lang;
+
+  /* Update toggle buttons */
+  document.querySelectorAll('#lang-toggle .lang-opt').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  /* Update static elements with data-i18n */
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  /* Update all dynamic card elements */
+  document.querySelectorAll('.info-label[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  document.querySelectorAll('.thc-sub').forEach(el => {
+    el.textContent = t('thc_sub');
+  });
+
+  document.querySelectorAll('.front-tap').forEach(el => {
+    el.textContent = t('tap_open');
+  });
+
+  document.querySelectorAll('.back-close').forEach(el => {
+    el.textContent = t('tap_close');
+  });
+
+  /* Update tipo values */
+  document.querySelectorAll('.info-value[data-tipo-key]').forEach(el => {
+    const key = el.dataset.tipoKey;
+    if (key) el.textContent = t(key);
+  });
+
+  /* Update terpene profiles */
+  document.querySelectorAll('.profile-value[data-profile]').forEach(el => {
+    const profile = el.dataset.profile.split(',');
+    el.textContent = translateProfile(profile);
+  });
+}
+
+/* ─────────────────────────────────────────
+   STRAIN DATA
+───────────────────────────────────────── */
+const strains = [
+  { num:'01', name:'Dante Inferno', genetica:'Oreoz × Devil Driver',          tipo:'Híbrida Indica Dominante',   thc:'27–30%', profile:['Diesel','Citrus','Earthy'],   img:'images/dante_V2.png' },
+  { num:'02', name:'Boofscotti',    genetica:'Super Boof × Biscotti',          tipo:'Híbrida Balanceada',         thc:'26–29%', profile:['Diesel','Creamy','Citrus'],   img:'images/boof_scotti_V1.png' },
+  { num:'03', name:'Full',          genetica:'Unknown Cut',                    tipo:'Híbrida Sativa Dominante',   thc:'24–27%', profile:['Citrus','Earthy'],             img:'images/full_V1.png' },
+  { num:'04', name:'Tamales',       genetica:'Unknown Cut',                    tipo:'Híbrida Indica Dominante',   thc:'25–28%', profile:['Earthy','Diesel','Pepper'],    img:'images/tamales_V1.png' },
+  { num:'05', name:'Sherb',         genetica:'Sunset Sherbet Lineage',         tipo:'Híbrida Balanceada',         thc:'23–26%', profile:['Creamy','Citrus','Floral'],    img:'images/sherb_V2.png' },
+  { num:'06', name:'Brr Berry',     genetica:'Berry Hybrid',                   tipo:'Híbrida Sativa Dominante',   thc:'23–26%', profile:['Berry','Pine','Citrus'],       img:'images/brr_berry_V1.png' },
+  { num:'07', name:'Fruit',         genetica:'Fruit Hybrid',                   tipo:'Híbrida Sativa Dominante',   thc:'22–25%', profile:['Tropical','Citrus','Sweet'],   img:'images/fruit_V1.png' },
+  { num:'08', name:'Biscotti',      genetica:'Gelato #25 × South Florida OG',  tipo:'Híbrida Indica Dominante',   thc:'25–29%', profile:['Creamy','Diesel','Sweet'],     img:'images/biscoti_V1.png' }
+];
+
+/* ─────────────────────────────────────────
+   BUILD CARDS
+───────────────────────────────────────── */
+const grid = document.getElementById('grid');
+
+strains.forEach(s => {
+  const tipoKey = tipoKeyMap[s.tipo] || '';
+  const wrap = document.createElement('div');
+  wrap.className = 'card-wrap';
+  wrap.innerHTML = `
+    <div class="card-inner">
+
+      <div class="card-front">
+        <div class="front-header">
+          <span class="front-num">${s.num}</span>
+          <span class="front-name">${s.name}</span>
+        </div>
+        <div class="front-img-area">
+          <img src="${s.img}" alt="${s.name}">
+        </div>
+        <div class="front-footer">
+          <span class="front-thc">THC ${s.thc}</span>
+          <span class="front-tap">${t('tap_open')}</span>
+        </div>
+      </div>
+
+      <div class="card-back">
+        <div class="back-top">
+          <div class="back-num">— ${s.num} —</div>
+          <div class="back-name">${s.name}</div>
+        </div>
+        <div class="back-body">
+          <div class="info-block">
+            <span class="info-label" data-i18n="label_genetica">${t('label_genetica')}</span>
+            <span class="info-value">${s.genetica}</span>
+          </div>
+          <div class="sep"></div>
+          <div class="info-block">
+            <span class="info-label" data-i18n="label_tipo">${t('label_tipo')}</span>
+            <span class="info-value" data-tipo-key="${tipoKey}">${t(tipoKey) || s.tipo}</span>
+          </div>
+          <div class="sep"></div>
+          <div class="info-block">
+            <span class="info-label" data-i18n="label_thc">${t('label_thc')}</span>
+            <div class="thc-big">${s.thc}</div>
+            <div class="thc-sub">${t('thc_sub')}</div>
+          </div>
+          <div class="sep"></div>
+          <div class="info-block">
+            <span class="info-label" data-i18n="label_perfil">${t('label_perfil')}</span>
+            <div class="info-value profile-value" data-profile="${s.profile.join(',')}">${translateProfile(s.profile)}</div>
+          </div>
+        </div>
+        <div class="back-foot">
+          <span class="back-close">${t('tap_close')}</span>
+          <span class="back-brand">Strain Catalog</span>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  /* Touch / click flip */
+  let touchMoved = false;
+  wrap.addEventListener('touchstart', () => { touchMoved = false; }, { passive: true });
+  wrap.addEventListener('touchmove',  () => { touchMoved = true;  }, { passive: true });
+  wrap.addEventListener('touchend', (e) => {
+    if (!touchMoved) { e.preventDefault(); wrap.classList.toggle('flipped'); }
+  });
+  wrap.addEventListener('click', () => {
+    if (!('ontouchstart' in window)) wrap.classList.toggle('flipped');
+  });
+
+  grid.appendChild(wrap);
+});
+
+/* ─────────────────────────────────────────
+   LANGUAGE TOGGLE INIT
+───────────────────────────────────────── */
+const toggle = document.getElementById('lang-toggle');
+
+toggle.addEventListener('click', () => {
+  setLanguage(currentLang === 'es' ? 'en' : 'es');
+});
+
+toggle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    setLanguage(currentLang === 'es' ? 'en' : 'es');
+  }
+});
+
+/* Apply saved/default language on load */
+setLanguage(currentLang);
+</script>
+</body>
+</html>
